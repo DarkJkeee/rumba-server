@@ -1,4 +1,4 @@
-package com.company.rumba.email;
+package com.company.rumba.auth.email;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,7 @@ public class EmailService implements EmailSender {
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject("Confirm your email");
+            log.info("Email has sent");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("Failed to send email", e);

@@ -2,7 +2,12 @@ package com.company.rumba.user;
 
 import com.company.rumba.auth.token.ConfirmationToken;
 import com.company.rumba.auth.token.ConfirmationTokenService;
+import com.company.rumba.errors.CustomErrorException;
+import com.company.rumba.errors.ErrorType;
+import com.company.rumba.errors.PathProvider;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AppUserService implements UserDetailsService {
     private final static String USER_NOT_FOUND = "User with email %s not found";
 
@@ -32,16 +38,16 @@ public class AppUserService implements UserDetailsService {
     }
 
     public String signUpUser(AppUser appUser) {
-        boolean userExists = appUserRepository
-                .findByEmail(appUser.getEmail())
-                .isPresent();
+        var user = appUserRepository.findByEmail(appUser.getEmail());
 
-        if (userExists) {
-            // TODO check of attributes are the same and
-            // TODO if email not confirmed send confirmation email.
-
-
-            throw new IllegalStateException("email already taken");
+        if (user.isPresent() && !user.get().isEnabled()) {
+            log.error(String.format("Email %s has already taken", appUser.getEmail()));
+            throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    ErrorType.EMAIL_EXIST,
+                    PathProvider.getCurrentPath(),
+                    String.format("Email %s has already taken", appUser.getEmail())
+            );
         }
 
         appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
@@ -53,9 +59,10 @@ public class AppUserService implements UserDetailsService {
                 appUser
         );
         confirmationTokenService.saveConfirmationToken(token);
-
-
-
         return token.getToken();
     }
+
+//    public String signInUser() {
+//
+//    }
 }

@@ -4,6 +4,7 @@ import com.company.rumba.auth.request.LoginRequest;
 import com.company.rumba.auth.request.RegistrationRequest;
 import com.company.rumba.auth.service.AuthService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,8 +14,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/registration")
-    public String register(@RequestBody RegistrationRequest request) {
-        return authService.register(request);
+    public ResponseEntity<String> register(@RequestBody RegistrationRequest request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
@@ -23,7 +24,7 @@ public class AuthController {
     }
 
     @GetMapping("/confirm")
-    public String confirmToken(@RequestParam("token") String token) {
-        return authService.confirmToken(token);
+    public ResponseEntity<String> confirmToken(@RequestParam("token") String token) {
+        return ResponseEntity.ok(authService.confirmToken(token));
     }
 }
