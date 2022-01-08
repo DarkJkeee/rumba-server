@@ -4,27 +4,46 @@ import com.company.rumba.auth.request.LoginRequest;
 import com.company.rumba.auth.request.RegistrationRequest;
 import com.company.rumba.auth.service.AuthService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "auth")
 @AllArgsConstructor
 public class AuthController {
-    private AuthService authService;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss");
+    private final AuthService authService;
 
-    @PostMapping("/registration")
-    public ResponseEntity<String> register(@RequestBody RegistrationRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("token", authService.register(request));
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/login")
-    public String register(@RequestBody LoginRequest request) {
-        return authService.login(request);
+    public ResponseEntity<?> register(@RequestBody LoginRequest request) {
+        var response = authService.login(request);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("created_at", LocalDateTime.now().format(dateFormatter));
+        responseBody.put("expires_at", response.getValue1().format(dateFormatter));
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Authorization", response.getValue0());
+        return ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(responseBody);
     }
 
     @GetMapping("/confirm")
-    public ResponseEntity<String> confirmToken(@RequestParam("token") String token) {
-        return ResponseEntity.ok(authService.confirmToken(token));
+    public ResponseEntity<?> confirmToken(@RequestParam("token") String token) {
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", authService.confirmToken(token));
+        return ResponseEntity.ok(responseBody);
     }
 }

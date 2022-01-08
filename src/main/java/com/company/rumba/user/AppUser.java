@@ -1,5 +1,6 @@
 package com.company.rumba.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +12,7 @@ import java.util.Collection;
 @Entity
 @Data
 @NoArgsConstructor
+@JsonIgnoreProperties(value = { "password", "locked", "enabled" })
 public class AppUser implements UserDetails {
 
     @Id
@@ -24,8 +26,11 @@ public class AppUser implements UserDetails {
             generator = "user_sequence"
     )
     private Long accountId;
+    @Column(length = 50)
     private String firstName;
+    @Column(length = 50)
     private String lastName;
+    @Column(length = 50)
     private String email;
     private String password;
     private Boolean locked = false;

@@ -1,10 +1,11 @@
 package com.company.rumba.errors;
 
 public enum ErrorType {
-
+    ACCOUNT_NOT_CONFIRMED,
     CONFIRM_TOKEN_EXPIRED,
     CONFIRM_TOKEN_NOT_EXIST,
     EMAIL_CONFIRMED,
     EMAIL_EXIST,
-
+    EMAIL_NOT_FOUND,
+    INVALID_CREDENTIALS
 }

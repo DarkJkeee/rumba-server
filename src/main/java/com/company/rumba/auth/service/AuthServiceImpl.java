@@ -1,5 +1,6 @@
 package com.company.rumba.auth.service;
 
+import com.company.rumba.auth.jwt.JwtProvider;
 import com.company.rumba.auth.request.LoginRequest;
 import com.company.rumba.auth.request.RegistrationRequest;
 import com.company.rumba.auth.token.ConfirmationTokenService;
@@ -10,7 +11,9 @@ import com.company.rumba.errors.PathProvider;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
+import org.javatuples.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,8 @@ public class AuthServiceImpl implements AuthService {
     private final AppUserService appUserService;
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
+    private final JwtProvider jwtProvider;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public String register(RegistrationRequest request) {
@@ -40,10 +45,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginRequest request) {
-        
+    public Pair<String, LocalDateTime> login(LoginRequest request) {
+        AppUser user = appUserService.loadUserByUsername(request.getEmail());
+        if (!user.isEnabled()) {
+            throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    ErrorType.ACCOUNT_NOT_CONFIRMED,
+                    PathProvider.getCurrentPath(),
+                    "Account hasn't confirmed yet"
+            );
+        }
+        if (!bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    ErrorType.INVALID_CREDENTIALS,
+                    PathProvider.getCurrentPath(),
+                    "Incorrect email or password"
+            );
+        }
 
-        return "Logged in";
+        return jwtProvider.generateToken(user.getEmail());
     }
 
     @Override
