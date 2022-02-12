@@ -1,9 +1,11 @@
 package com.company.rumba.auth.jwt;
 
+import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,16 +35,21 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         log.info("jwt filter...");
-        String token = getTokenFromRequest(request);
-        if (token != null && jwtProvider.validateToken(token)) {
-            String userLogin = jwtProvider.getLoginFromToken(token);
-            AppUser customUserDetails = appUserService.loadUserByUsername(userLogin);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    customUserDetails,
-                    null,
-                    customUserDetails.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        try {
+            String token = getTokenFromRequest(request);
+            if (token != null && jwtProvider.validateToken(token)) {
+                String userLogin = jwtProvider.getLoginFromToken(token);
+                AppUser customUserDetails = appUserService.loadUserByUsername(userLogin);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        customUserDetails,
+                        null,
+                        customUserDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception e) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return;
         }
         filterChain.doFilter(request, response);
     }

@@ -12,15 +12,13 @@ public class ErrorController {
     public ResponseEntity<ErrorResponse> handleCustomErrorExceptions(Exception e) {
         CustomErrorException customErrorException = (CustomErrorException) e;
 
-        HttpStatus status = customErrorException.getStatus();
         return new ResponseEntity<>(
                 new ErrorResponse(
                         customErrorException.getType(),
                         customErrorException.getPath(),
-                        customErrorException.getMessage(),
-                        status
+                        customErrorException.getMessage()
                 ),
-                status
+                customErrorException.getStatus()
         );
     }
 }

@@ -14,17 +14,15 @@ public class ErrorResponse {
     private String type;
     private String path;
     private String message;
-    private int status;
 
     public ErrorResponse() {
         timestamp = new Date();
     }
 
-    public ErrorResponse(ErrorType type, String path, String message, HttpStatus httpStatus) {
+    public ErrorResponse(ErrorType type, String path, String message) {
         this();
         this.type = type.name();
         this.path = path;
         this.message = message;
-        this.status = httpStatus.value();
     }
 }

@@ -17,6 +17,7 @@ public class EventService {
     private final EventRepository eventRepository;
 
     public void createEvent(Event event) {
+        log.info("before " + event.toString());
         log.info(eventRepository.save(event).toString());
     }
 
