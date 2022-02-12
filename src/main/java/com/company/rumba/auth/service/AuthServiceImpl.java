@@ -11,6 +11,7 @@ import com.company.rumba.errors.PathProvider;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AppUserService appUserService;

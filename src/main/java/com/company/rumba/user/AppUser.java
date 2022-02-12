@@ -26,11 +26,11 @@ public class AppUser implements UserDetails {
             generator = "user_sequence"
     )
     private Long accountId;
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String firstName;
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String lastName;
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String email;
     private String password;
     private Boolean locked = false;
