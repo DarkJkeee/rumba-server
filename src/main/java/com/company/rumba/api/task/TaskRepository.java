@@ -1,6 +1,5 @@
-package com.company.rumba.api.repo;
+package com.company.rumba.api.task;
 
-import com.company.rumba.api.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

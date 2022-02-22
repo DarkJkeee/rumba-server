@@ -1,4 +1,4 @@
-package com.company.rumba.api.service;
+package com.company.rumba.api.task;
 
 import org.springframework.stereotype.Service;
 

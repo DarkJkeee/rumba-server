@@ -1,4 +1,4 @@
-package com.company.rumba.api.service;
+package com.company.rumba.api.member;
 
 import org.springframework.stereotype.Service;
 

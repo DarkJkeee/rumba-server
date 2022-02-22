@@ -1,5 +1,6 @@
-package com.company.rumba.api.model;
+package com.company.rumba.api.event;
 
+import com.company.rumba.api.task.Task;
 import com.company.rumba.user.AppUser;
 import lombok.Data;
 

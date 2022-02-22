@@ -1,6 +1,5 @@
-package com.company.rumba.api.repo;
+package com.company.rumba.api.member;
 
-import com.company.rumba.api.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
