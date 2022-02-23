@@ -3,13 +3,13 @@ package com.company.rumba.auth;
 import com.company.rumba.auth.request.LoginRequest;
 import com.company.rumba.auth.request.RegistrationRequest;
 import com.company.rumba.auth.service.AuthService;
-import com.company.rumba.support.DateFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +17,6 @@ import java.util.Map;
 @RequestMapping(path = "auth")
 @AllArgsConstructor
 public class AuthController {
-    private final DateFormatter dateFormatter;
     private final AuthService authService;
 
     @PostMapping("/register")
@@ -31,8 +30,8 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody LoginRequest request) {
         var response = authService.login(request);
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("created_at", dateFormatter.dateToString(LocalDateTime.now()));
-        responseBody.put("expires_at", dateFormatter.dateToString(response.getValue1()));
+        responseBody.put("created_at", LocalDateTime.now().atZone(ZoneId.systemDefault()));
+        responseBody.put("expires_at", response.getValue1().atZone(ZoneId.systemDefault()));
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Authorization", response.getValue0());
         return ResponseEntity.ok()

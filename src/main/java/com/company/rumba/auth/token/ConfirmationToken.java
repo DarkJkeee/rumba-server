@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
@@ -25,11 +25,11 @@ public class ConfirmationToken {
     @Column(nullable = false)
     private String token;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime createdAt;
 
-    @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime expiresAt;
 
     @ManyToOne
     @JoinColumn(
@@ -38,12 +38,12 @@ public class ConfirmationToken {
     )
     private AppUser appUser;
 
-    private LocalDateTime confirmedAt;
+    private ZonedDateTime confirmedAt;
 
     public ConfirmationToken(
             String token,
-            LocalDateTime createdAt,
-            LocalDateTime expiresAt,
+            ZonedDateTime createdAt,
+            ZonedDateTime expiresAt,
             AppUser appUser
     ) {
         this.token = token;

@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
@@ -27,11 +28,11 @@ public class Task {
 
     private String description;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "Start date is mandatory")
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "End date is mandatory")
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
 }

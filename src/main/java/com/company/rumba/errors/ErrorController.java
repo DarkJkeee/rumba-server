@@ -11,7 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @ControllerAdvice
 public class ErrorController {
-
     @ExceptionHandler(CustomErrorException.class)
     public ResponseEntity<ErrorResponse> handleCustomErrorExceptions(CustomErrorException e) {
         return new ResponseEntity<>(

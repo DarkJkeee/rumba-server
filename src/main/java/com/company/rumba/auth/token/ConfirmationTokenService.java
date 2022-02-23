@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
@@ -16,7 +17,7 @@ public class ConfirmationTokenService {
     }
 
     public void setConfirmedAt(String token) {
-        confirmationTokenRepository.updateConfirmedAt(token, LocalDateTime.now());
+        confirmationTokenRepository.updateConfirmedAt(token, ZonedDateTime.now());
     }
 
     public Optional<ConfirmationToken> getConfirmationToken(String token) {

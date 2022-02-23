@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -65,8 +66,8 @@ public class AppUserService implements UserDetailsService {
     private String generateConfirmationToken(AppUser appUser) {
         ConfirmationToken token = new ConfirmationToken(
                 UUID.randomUUID().toString(),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15),
+                LocalDateTime.now().atZone(ZoneId.systemDefault()),
+                LocalDateTime.now().plusMinutes(15).atZone(ZoneId.systemDefault()),
                 appUser
         );
         confirmationTokenService.saveConfirmationToken(token);

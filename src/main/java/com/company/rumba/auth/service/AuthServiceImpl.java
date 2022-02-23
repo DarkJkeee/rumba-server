@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Service
 @Slf4j
@@ -84,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
                     "Email has already confirmed"
             );
         }
-        if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (confirmationToken.getExpiresAt().isBefore(ZonedDateTime.now())) {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.CONFIRM_TOKEN_EXPIRED,
