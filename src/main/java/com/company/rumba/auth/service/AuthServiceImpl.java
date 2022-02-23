@@ -7,7 +7,6 @@ import com.company.rumba.auth.token.ConfirmationTokenService;
 import com.company.rumba.auth.email.EmailSender;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
-import com.company.rumba.errors.PathProvider;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
@@ -53,7 +52,6 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.ACCOUNT_NOT_CONFIRMED,
-                    PathProvider.getCurrentPath(),
                     "Account hasn't confirmed yet"
             );
         }
@@ -61,7 +59,6 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.INVALID_CREDENTIALS,
-                    PathProvider.getCurrentPath(),
                     "Incorrect email or password"
             );
         }
@@ -77,7 +74,6 @@ public class AuthServiceImpl implements AuthService {
                     throw new CustomErrorException(
                             HttpStatus.BAD_REQUEST,
                             ErrorType.CONFIRM_TOKEN_NOT_EXIST,
-                            PathProvider.getCurrentPath(),
                             "Confirmation token doesn't exist"
                     );
                 });
@@ -85,7 +81,6 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.EMAIL_CONFIRMED,
-                    PathProvider.getCurrentPath(),
                     "Email has already confirmed"
             );
         }
@@ -93,7 +88,6 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.CONFIRM_TOKEN_EXPIRED,
-                    PathProvider.getCurrentPath(),
                     "Confirmation token has expired"
             );
         }

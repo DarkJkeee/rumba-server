@@ -5,6 +5,7 @@ import com.company.rumba.user.AppUser;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,20 +23,31 @@ public class Event {
             generator = "event_sequence"
     )
     private Long eventId;
-    @Column(length = 40, nullable = false)
+
+    @Column(length = 40)
+    @NotNull(message = "Title is mandatory")
     private String title;
+
     private String description;
-    @Column(nullable = false)
+
+    @Column(name = "is_online")
+    @NotNull(message = "The format is mandatory")
     private Boolean isOnline;
+
     private Float latitude;
     private Float longitude;
-    @Column(nullable = false)
+
+    @Column(name = "start_date")
+    @NotNull(message = "Start date is mandatory")
     private LocalDateTime startDate;
-    @Column(nullable = false)
+
+    @Column(name = "end_date")
+    @NotNull(message = "End date is mandatory")
     private LocalDateTime endDate;
 
     @OneToMany
     private List<Task> tasks;
+
     @ManyToOne
     @JoinColumn(name="creator_id")
     private AppUser creator;

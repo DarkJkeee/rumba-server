@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 @Entity
@@ -15,7 +16,6 @@ import java.util.Collection;
 @NoArgsConstructor
 @JsonIgnoreProperties(value = { "password", "locked", "enabled" })
 public class AppUser implements UserDetails {
-
     @Id
     @SequenceGenerator(
             name = "user_sequence",
@@ -26,13 +26,21 @@ public class AppUser implements UserDetails {
             strategy = GenerationType.SEQUENCE,
             generator = "user_sequence"
     )
+    @Column(name = "account_id")
     private Long accountId;
-    @Column(length = 50, nullable = false)
+
+    @Column(name = "first_name", length = 50)
+    @NotNull(message = "First name is mandatory")
     private String firstName;
-    @Column(length = 50, nullable = false)
+
+    @Column(name = "last_name", length = 50)
+    @NotNull(message = "Last name is mandatory")
     private String lastName;
-    @Column(length = 50, nullable = false)
+
+    @Column(length = 50)
+    @NotNull(message = "Email is mandatory")
     private String email;
+
     private String password;
     private Boolean locked = false;
     private Boolean enabled = false;

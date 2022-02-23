@@ -4,23 +4,37 @@ import com.company.rumba.api.task.Task;
 import com.company.rumba.user.AppUser;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 public class Member {
     @Id
+    @SequenceGenerator(
+            name = "member_sequence",
+            sequenceName = "member_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "member_sequence"
+    )
+    @Column(name = "member_id")
     private Long memberId;
+
     @OneToOne
-    private AppUser user;
+    private AppUser member;
+
     @OneToOne
     private Task task;
-    @Column(nullable = false)
+
+    @Column(name = "start_date")
+    @NotNull(message = "Start date is mandatory")
     private LocalDateTime startDate;
-    @Column(nullable = false)
+
+    @Column(name = "end_date")
+    @NotNull(message = "End date is mandatory")
     private LocalDateTime endDate;
 }

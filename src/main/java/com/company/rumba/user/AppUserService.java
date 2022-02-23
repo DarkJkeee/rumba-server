@@ -4,7 +4,6 @@ import com.company.rumba.auth.token.ConfirmationToken;
 import com.company.rumba.auth.token.ConfirmationTokenService;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
-import com.company.rumba.errors.PathProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,6 @@ public class AppUserService implements UserDetailsService {
                 new CustomErrorException(
                         HttpStatus.BAD_REQUEST,
                         ErrorType.EMAIL_NOT_FOUND,
-                        PathProvider.getCurrentPath(),
                         String.format(USER_NOT_FOUND, email)
                 )
         );
@@ -54,7 +52,6 @@ public class AppUserService implements UserDetailsService {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
                     ErrorType.EMAIL_EXIST,
-                    PathProvider.getCurrentPath(),
                     String.format("Email %s has already taken", appUser.getEmail())
             );
         }
