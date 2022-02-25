@@ -33,6 +33,8 @@ public class Event {
     @Column(name = "is_online")
     @NotNull(message = "The format is mandatory")
     private Boolean isOnline;
+
+    // TODO: Can add methods to compute properties.
     private Boolean isCancelled;
     private Boolean rescheduled;
 

@@ -22,6 +22,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
         Map<String, Object> responseBody = new HashMap<>();
+        // TODO: Delete token from response
         responseBody.put("token", authService.register(request));
         return ResponseEntity.ok(responseBody);
     }

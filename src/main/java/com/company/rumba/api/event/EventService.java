@@ -21,10 +21,11 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
 
-    public void createEvent(Event event) {
+    public Event createEvent(Event event) {
         event.setCreator(userProvider.getCurrentAppUser());
-        eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
         log.info("Event saved");
+        return savedEvent;
     }
 
     public List<ListEvent> getCreatedEvents() {
@@ -35,11 +36,30 @@ public class EventService {
     }
 
     public Event getEvent(Long id) {
-        return eventRepository.findById(id)
+        return eventRepository
+                .findById(id)
                 .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.BAD_REQUEST,
+                        HttpStatus.NOT_FOUND,
                         ErrorType.EVENT_NOT_FOUND,
                         "Event does not exist"
+                ));
+    }
+
+    public Event changeEvent(Event newEvent, Long id) {
+        return eventRepository
+                .findById(id)
+                .map(event -> {
+                    if (newEvent.getTitle() != null) event.setTitle(newEvent.getTitle());
+                    if (newEvent.getDescription() != null) event.setDescription(newEvent.getDescription());
+                    if (newEvent.getIsOnline() != null) event.setIsOnline(newEvent.getIsOnline());
+                    if (newEvent.getStartDate() != null) event.setStartDate(newEvent.getStartDate());
+                    if (newEvent.getEndDate() != null) event.setEndDate(newEvent.getEndDate());
+                    return eventRepository.save(event);
+                })
+                .orElseThrow(() -> new CustomErrorException(
+                        HttpStatus.NOT_FOUND,
+                        ErrorType.EVENT_NOT_FOUND,
+                        "Event doesn't exist"
                 ));
     }
 }
