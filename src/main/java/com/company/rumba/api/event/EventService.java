@@ -54,6 +54,8 @@ public class EventService {
                     if (newEvent.getIsOnline() != null) event.setIsOnline(newEvent.getIsOnline());
                     if (newEvent.getStartDate() != null) event.setStartDate(newEvent.getStartDate());
                     if (newEvent.getEndDate() != null) event.setEndDate(newEvent.getEndDate());
+                    if (newEvent.getLatitude() != null) event.setLatitude(newEvent.getLatitude());
+                    if (newEvent.getLongitude() != null) event.setLongitude(newEvent.getLongitude());
                     return eventRepository.save(event);
                 })
                 .orElseThrow(() -> new CustomErrorException(
@@ -62,4 +64,6 @@ public class EventService {
                         "Event doesn't exist"
                 ));
     }
+
+
 }

@@ -22,6 +22,7 @@ public class Event {
             strategy = GenerationType.SEQUENCE,
             generator = "event_sequence"
     )
+    @Column(name = "event_id")
     private Long eventId;
 
     @Column(length = 40)
@@ -49,10 +50,10 @@ public class Event {
     @NotNull(message = "End date is mandatory")
     private ZonedDateTime endDate;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Task> tasks;
 
     @ManyToOne
-    @JoinColumn(name="creator_id")
+    @JoinColumn(name = "creator_id")
     private AppUser creator;
 }

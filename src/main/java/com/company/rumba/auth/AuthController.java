@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "auth")
 @AllArgsConstructor
+@RequestMapping(path = "auth")
 public class AuthController {
     private final AuthService authService;
 
