@@ -1,4 +1,4 @@
-package com.company.rumba.support;
+package com.company.rumba.utils;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

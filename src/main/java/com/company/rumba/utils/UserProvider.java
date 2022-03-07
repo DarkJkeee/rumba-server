@@ -1,4 +1,4 @@
-package com.company.rumba.support;
+package com.company.rumba.utils;
 
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;

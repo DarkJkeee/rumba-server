@@ -3,7 +3,7 @@ package com.company.rumba.api.event;
 import com.company.rumba.api.dto.ListEvent;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
-import com.company.rumba.support.UserProvider;
+import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -29,7 +29,8 @@ public class EventService {
     }
 
     public List<ListEvent> getCreatedEvents() {
-        return eventRepository.findAllCreatedBy(userProvider.getCurrentUserID())
+        return eventRepository
+                .findAllCreatedBy(userProvider.getCurrentUserID())
                 .stream()
                 .map(event -> modelMapper.map(event, ListEvent.class))
                 .collect(Collectors.toList());
@@ -64,6 +65,4 @@ public class EventService {
                         "Event doesn't exist"
                 ));
     }
-
-
 }
