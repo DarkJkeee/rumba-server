@@ -13,7 +13,7 @@ import javax.validation.Valid;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping("")
+    @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> createEvent(@Valid @RequestBody Event event) {
         return ResponseEntity.ok(eventService.createEvent(event));

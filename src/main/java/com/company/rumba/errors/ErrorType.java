@@ -9,5 +9,6 @@ public enum ErrorType {
     EMAIL_NOT_FOUND,
     EVENT_NOT_FOUND,
     INVALID_CREDENTIALS,
+    TASK_NOT_FOUND,
     VALIDATION_ERROR
 }

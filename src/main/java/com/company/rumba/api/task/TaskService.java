@@ -7,17 +7,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
-
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
 
     public void createTask(Task task, Long eventId) {
         eventRepository
@@ -30,6 +24,23 @@ public class TaskService {
                         HttpStatus.NOT_FOUND,
                         ErrorType.EVENT_NOT_FOUND,
                         "Event doesn't exist"
+                ));
+    }
+
+    public Task changeTask(Task newTask, Long id) {
+        return taskRepository
+                .findById(id)
+                .map(task -> {
+                    if (newTask.getTitle() != null) task.setTitle(newTask.getTitle());
+                    if (newTask.getDescription() != null) task.setDescription(newTask.getDescription());
+                    if (newTask.getStartDate() != null) task.setStartDate(newTask.getStartDate());
+                    if (newTask.getEndDate() != null) task.setEndDate(newTask.getEndDate());
+                    return taskRepository.save(task);
+                })
+                .orElseThrow(() -> new CustomErrorException(
+                        HttpStatus.NOT_FOUND,
+                        ErrorType.TASK_NOT_FOUND,
+                        "Task doesn't exist"
                 ));
     }
 }

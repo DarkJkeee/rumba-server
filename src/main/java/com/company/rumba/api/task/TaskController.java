@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
     private final TaskService taskService;
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createTask(@RequestBody Task task, @RequestParam("event_id") Long event_id) {
         taskService.createTask(task, event_id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> changeTask(@RequestBody Task task, @PathVariable Long id) {
+        return ResponseEntity.ok(taskService.changeTask(task, id));
     }
 }
