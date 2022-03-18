@@ -33,11 +33,8 @@ public class AuthController {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("created_at", LocalDateTime.now().atZone(ZoneId.systemDefault()));
         responseBody.put("expires_at", response.getValue1().atZone(ZoneId.systemDefault()));
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Authorization", response.getValue0());
-        return ResponseEntity.ok()
-                .headers(responseHeaders)
-                .body(responseBody);
+        responseBody.put("token", response.getValue0());
+        return ResponseEntity.ok(responseBody);
     }
 
     @GetMapping("/confirm")
