@@ -4,10 +4,10 @@ import com.company.rumba.auth.request.LoginRequest;
 import com.company.rumba.auth.request.RegistrationRequest;
 import org.javatuples.Pair;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public interface AuthService {
     String register(RegistrationRequest request);
-    Pair<String, LocalDateTime> login(LoginRequest request);
+    Pair<String, ZonedDateTime> login(LoginRequest request);
     String confirmToken(String token);
 }

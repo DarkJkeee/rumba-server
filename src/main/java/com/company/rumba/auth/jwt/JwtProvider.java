@@ -6,8 +6,7 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Component
@@ -17,12 +16,12 @@ public class JwtProvider {
     @Value("$(jwt.secret)")
     private String jwtSecret;
 
-    public Pair<String, LocalDateTime> generateToken(String login) {
-        LocalDateTime expiresAt = LocalDateTime.now().plusDays(15);
+    public Pair<String, ZonedDateTime> generateToken(String login) {
+        ZonedDateTime expiresAt = ZonedDateTime.now().plusDays(15);
         return new Pair<>(
                 Jwts.builder()
                         .setSubject(login)
-                        .setExpiration(Date.from(expiresAt.atZone(ZoneId.systemDefault()).toInstant()))
+                        .setExpiration(Date.from(expiresAt.toInstant()))
                         .signWith(SignatureAlgorithm.HS512, jwtSecret)
                         .compact(),
                 expiresAt
