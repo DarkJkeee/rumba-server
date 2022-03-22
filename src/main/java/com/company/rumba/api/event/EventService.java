@@ -21,16 +21,37 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
 
-    public Event createEvent(Event event) {
+    public void createEvent(Event event) {
         event.setCreator(userProvider.getCurrentAppUser());
-        Event savedEvent = eventRepository.save(event);
-        log.info("Event saved");
-        return savedEvent;
+        eventRepository.save(event);
+    }
+
+    public void changeEvent(Event newEvent, Long id) {
+        if (!eventRepository.existsById(id)) {
+            throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    ErrorType.EVENT_NOT_FOUND,
+                    "Event does not exist"
+            );
+        }
+
+        newEvent.getMembers().clear();
+        newEvent.setCreator(userProvider.getCurrentAppUser());
+        newEvent.setEventId(id);
+        eventRepository.save(newEvent);
     }
 
     public List<ListEvent> getCreatedEvents() {
         return eventRepository
                 .findAllCreatedBy(userProvider.getCurrentUserID())
+                .stream()
+                .map(event -> modelMapper.map(event, ListEvent.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<ListEvent> getParticipatedEvents() {
+        return eventRepository
+                .findAllParticipatedBy(userProvider.getCurrentAppUser())
                 .stream()
                 .map(event -> modelMapper.map(event, ListEvent.class))
                 .collect(Collectors.toList());
@@ -43,26 +64,6 @@ public class EventService {
                         HttpStatus.NOT_FOUND,
                         ErrorType.EVENT_NOT_FOUND,
                         "Event does not exist"
-                ));
-    }
-
-    public Event changeEvent(Event newEvent, Long id) {
-        return eventRepository
-                .findById(id)
-                .map(event -> {
-                    if (newEvent.getTitle() != null) event.setTitle(newEvent.getTitle());
-                    if (newEvent.getDescription() != null) event.setDescription(newEvent.getDescription());
-                    if (newEvent.getIsOnline() != null) event.setIsOnline(newEvent.getIsOnline());
-                    if (newEvent.getStartDate() != null) event.setStartDate(newEvent.getStartDate());
-                    if (newEvent.getEndDate() != null) event.setEndDate(newEvent.getEndDate());
-                    if (newEvent.getLatitude() != null) event.setLatitude(newEvent.getLatitude());
-                    if (newEvent.getLongitude() != null) event.setLongitude(newEvent.getLongitude());
-                    return eventRepository.save(event);
-                })
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.EVENT_NOT_FOUND,
-                        "Event doesn't exist"
                 ));
     }
 }

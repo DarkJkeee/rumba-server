@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -23,8 +24,10 @@ public class Task {
     private Long taskId;
 
     @NotNull(message = "Title is mandatory")
+    @Size(min = 1, max = 40)
     private String title;
 
+    @NotNull(message = "Description is mandatory")
     private String description;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")

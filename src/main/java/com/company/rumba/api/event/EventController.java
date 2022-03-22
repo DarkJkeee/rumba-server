@@ -15,22 +15,28 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> createEvent(@Valid @RequestBody Event event) {
-        return ResponseEntity.ok(eventService.createEvent(event));
+    public void createEvent(@Valid @RequestBody Event event) {
+        eventService.createEvent(event);
     }
 
-    @GetMapping("/all")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeEvent(@Valid @RequestBody Event newEvent, @PathVariable Long id) {
+        eventService.changeEvent(newEvent, id);
+    }
+
+    @GetMapping("/created")
     public ResponseEntity<?> getCreatedEvents() {
         return ResponseEntity.ok(eventService.getCreatedEvents());
+    }
+
+    @GetMapping("/participated")
+    public ResponseEntity<?> getParticipatedEvents() {
+        return ResponseEntity.ok(eventService.getParticipatedEvents());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getEvent(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getEvent(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> changeEvent(@RequestBody Event newEvent, @PathVariable Long id) {
-        return ResponseEntity.ok(eventService.changeEvent(newEvent, id));
     }
 }

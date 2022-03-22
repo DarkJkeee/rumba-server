@@ -13,7 +13,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
 
-    public void createTask(Task task, Long eventId) {
+    public void addTask(Task task, Long eventId) {
         eventRepository
                 .findById(eventId)
                 .map(event -> {
@@ -27,20 +27,16 @@ public class TaskService {
                 ));
     }
 
-    public Task changeTask(Task newTask, Long id) {
-        return taskRepository
-                .findById(id)
-                .map(task -> {
-                    if (newTask.getTitle() != null) task.setTitle(newTask.getTitle());
-                    if (newTask.getDescription() != null) task.setDescription(newTask.getDescription());
-                    if (newTask.getStartDate() != null) task.setStartDate(newTask.getStartDate());
-                    if (newTask.getEndDate() != null) task.setEndDate(newTask.getEndDate());
-                    return taskRepository.save(task);
-                })
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.TASK_NOT_FOUND,
-                        "Task doesn't exist"
-                ));
+    public void changeTask(Task newTask, Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new CustomErrorException(
+                    HttpStatus.NOT_FOUND,
+                    ErrorType.TASK_NOT_FOUND,
+                    "Task doesn't exist"
+            );
+        }
+
+        newTask.setTaskId(id);
+        taskRepository.save(newTask);
     }
 }

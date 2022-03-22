@@ -1,14 +1,24 @@
 package com.company.rumba.api.member;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/member")
+@AllArgsConstructor
+@RequestMapping("api/members")
 public class MemberController {
-    @GetMapping("/add")
-    public String addMember() {
-        return "added";
+    private final MemberService memberService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addMember(@RequestParam("event_id") Long eventId) {
+        memberService.addMember(eventId);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMember(@RequestParam("event_id") Long eventId) {
+
     }
 }

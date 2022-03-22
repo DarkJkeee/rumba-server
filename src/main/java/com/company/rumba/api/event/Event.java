@@ -5,8 +5,11 @@ import com.company.rumba.user.AppUser;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,19 +28,22 @@ public class Event {
     @Column(name = "event_id")
     private Long eventId;
 
-    @Column(length = 40)
     @NotNull(message = "Title is mandatory")
+    @Size(min = 1, max = 40)
     private String title;
 
+    @NotNull(message = "Description is mandatory")
     private String description;
 
     @Column(name = "is_online")
     @NotNull(message = "The format is mandatory")
     private Boolean isOnline;
 
-    // TODO: Can add methods to compute properties.
-    private Boolean isCancelled;
-    private Boolean rescheduled;
+    @Column(name = "is_cancelled")
+    private Boolean isCancelled = false;
+
+    @Column(name = "is_rescheduled")
+    private Boolean isRescheduled = false;
 
     private Float latitude;
     private Float longitude;
@@ -50,8 +56,12 @@ public class Event {
     @NotNull(message = "End date is mandatory")
     private ZonedDateTime endDate;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Task> tasks;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @NotNull(message = "Tasks is mandatory")
+    private List<@Valid Task> tasks;
+
+    @ManyToMany
+    private List<AppUser> members = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "creator_id")

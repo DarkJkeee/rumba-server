@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
+
 @ControllerAdvice
 public class ErrorController {
     @ExceptionHandler(CustomErrorException.class)
@@ -17,7 +19,7 @@ public class ErrorController {
                 new ErrorResponse(
                         e.getType(),
                         ServletUriComponentsBuilder.fromCurrentRequest().build().getPath(),
-                        e.getMessage()
+                        List.of(e.getMessage())
                 ),
                 e.getStatus()
         );
