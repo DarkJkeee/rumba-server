@@ -19,6 +19,6 @@ public class MemberController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMember(@RequestParam("event_id") Long eventId) {
-
+        memberService.deleteMember(eventId);
     }
 }

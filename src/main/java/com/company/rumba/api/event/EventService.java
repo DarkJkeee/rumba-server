@@ -29,7 +29,7 @@ public class EventService {
     public void changeEvent(Event newEvent, Long id) {
         if (!eventRepository.existsById(id)) {
             throw new CustomErrorException(
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.NOT_FOUND,
                     ErrorType.EVENT_NOT_FOUND,
                     "Event does not exist"
             );
