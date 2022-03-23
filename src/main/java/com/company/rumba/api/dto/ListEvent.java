@@ -6,10 +6,12 @@ import java.time.ZonedDateTime;
 
 @Data
 public class ListEvent {
-    private Long id;
+    private Long eventId;
     private String title;
     private String description;
     private Boolean isOnline;
+    private Boolean isCancelled;
+    private Boolean isRescheduled;
     private Float latitude;
     private Float longitude;
     private ZonedDateTime startDate;

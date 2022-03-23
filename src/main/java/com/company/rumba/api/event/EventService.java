@@ -27,15 +27,14 @@ public class EventService {
     }
 
     public void changeEvent(Event newEvent, Long id) {
-        if (!eventRepository.existsById(id)) {
-            throw new CustomErrorException(
-                    HttpStatus.NOT_FOUND,
-                    ErrorType.EVENT_NOT_FOUND,
-                    "Event does not exist"
-            );
-        }
-
-        newEvent.getMembers().clear();
+        var event = eventRepository
+                .findById(id)
+                .orElseThrow(() -> new CustomErrorException(
+                        HttpStatus.NOT_FOUND,
+                        ErrorType.EVENT_NOT_FOUND,
+                        "Event does not exist"
+                ));
+        newEvent.setMembers(event.getMembers());
         newEvent.setCreator(userProvider.getCurrentAppUser());
         newEvent.setEventId(id);
         eventRepository.save(newEvent);

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping
+    @GetMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addMember(@RequestParam("event_id") Long eventId) {
         memberService.addMember(eventId);
