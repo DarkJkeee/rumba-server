@@ -27,17 +27,15 @@ public class EventService {
     }
 
     public void changeEvent(Event newEvent, Long id) {
-        var event = eventRepository
+        eventRepository
                 .findById(id)
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.EVENT_NOT_FOUND,
-                        "Event does not exist"
-                ));
-        newEvent.setMembers(event.getMembers());
-        newEvent.setCreator(userProvider.getCurrentAppUser());
-        newEvent.setEventId(id);
-        eventRepository.save(newEvent);
+                .map(event -> {
+                    newEvent.setMembers(event.getMembers());
+                    newEvent.setCreator(userProvider.getCurrentAppUser());
+                    newEvent.setEventId(id);
+                    return eventRepository.save(newEvent);
+                })
+                .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
 
     public List<ListEvent> getCreatedEvents() {
@@ -59,10 +57,6 @@ public class EventService {
     public Event getEvent(Long id) {
         return eventRepository
                 .findById(id)
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.EVENT_NOT_FOUND,
-                        "Event does not exist"
-                ));
+                .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
 }

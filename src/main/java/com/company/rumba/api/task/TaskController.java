@@ -14,8 +14,8 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addTask(@Valid @RequestBody Task task, @RequestParam("event_id") Long event_id) {
-        taskService.addTask(task, event_id);
+    public void addTask(@Valid @RequestBody Task task, @RequestParam("event_id") Long eventId) {
+        taskService.addTask(task, eventId);
     }
 
     @PutMapping("/{id}")

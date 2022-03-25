@@ -1,5 +1,6 @@
 package com.company.rumba.api.event;
 
+import com.company.rumba.api.task.Task;
 import com.company.rumba.user.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,4 +15,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e WHERE :appUser member of e.members")
     List<Event> findAllParticipatedBy(AppUser appUser);
+
+    @Query("SELECT e FROM Event e WHERE :task member of e.tasks")
+    Event findEventByTask(Task task);
 }

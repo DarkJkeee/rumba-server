@@ -16,4 +16,22 @@ public class CustomErrorException extends RuntimeException {
         this.type = type;
         this.message = message;
     }
+
+    public static CustomErrorException eventNotExistError = new CustomErrorException(
+            HttpStatus.NOT_FOUND,
+            ErrorType.EVENT_NOT_FOUND,
+            "Event doesn't exist"
+    );
+
+    public static CustomErrorException taskNotExistError = new CustomErrorException(
+            HttpStatus.NOT_FOUND,
+            ErrorType.TASK_NOT_FOUND,
+            "Task doesn't exist"
+    );
+
+    public static CustomErrorException memberNotExistError = new CustomErrorException(
+            HttpStatus.NOT_FOUND,
+            ErrorType.MEMBER_NOT_FOUND,
+            "Member doesn't exist"
+    );
 }

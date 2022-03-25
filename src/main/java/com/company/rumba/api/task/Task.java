@@ -3,6 +3,7 @@ package com.company.rumba.api.task;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
@@ -29,6 +30,10 @@ public class Task {
 
     @NotNull(message = "Description is mandatory")
     private String description;
+
+    @NotNull(message = "Members count is mandatory")
+    @Min(value = 1)
+    private Integer membersCount;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "Start date is mandatory")

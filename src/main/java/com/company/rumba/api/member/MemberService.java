@@ -1,6 +1,7 @@
 package com.company.rumba.api.member;
 
 import com.company.rumba.api.event.EventRepository;
+import com.company.rumba.api.task.TaskRepository;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
 import com.company.rumba.utils.UserProvider;
@@ -13,6 +14,8 @@ import java.util.Objects;
 @Service
 @AllArgsConstructor
 public class MemberService {
+    private final TaskRepository taskRepository;
+    private final MemberRepository memberRepository;
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
 
@@ -30,31 +33,56 @@ public class MemberService {
                     event.getMembers().add(userProvider.getCurrentAppUser());
                     return eventRepository.save(event);
                 })
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.EVENT_NOT_FOUND,
-                        "Event doesn't exist"
-                ));
+                .orElseThrow(() -> CustomErrorException.eventNotExistError);
+    }
+
+    public void assignMember(Member member, Long taskId) {
+        taskRepository
+                .findById(taskId)
+                .map(task -> {
+                    var eventNotExist = eventRepository
+                            .findEventByTask(task)
+                            .getMembers()
+                            .stream()
+                            .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
+                    if (eventNotExist) {
+                        throw new CustomErrorException(
+                                HttpStatus.BAD_REQUEST,
+                                ErrorType.MEMBER_NOT_FOUND,
+                                "The user isn't a member of the event"
+                        );
+                    }
+                    member.setTask(task);
+                    member.setMember(userProvider.getCurrentAppUser());
+                    return memberRepository.save(member);
+                })
+                .orElseThrow(() -> CustomErrorException.taskNotExistError);
+    }
+
+    public void unassignMember(Long taskId) {
+        var task = taskRepository
+                .findById(taskId)
+                .orElseThrow(() -> CustomErrorException.taskNotExistError);
+        memberRepository
+                .findByTaskAndMember(task, userProvider.getCurrentAppUser())
+                .ifPresentOrElse(memberRepository::delete, () -> { throw CustomErrorException.memberNotExistError; });
     }
 
     public void deleteMember(Long eventId) {
         eventRepository
                 .findById(eventId)
                 .map(event -> {
-                    if (event.getMembers().removeIf(user -> Objects.equals(user.getAccountId(), userProvider.getCurrentUserID()))) {
+                    if (event.getMembers().removeIf(user -> user.getAccountId().equals(userProvider.getCurrentUserID()))) {
+                        event
+                                .getTasks()
+                                .forEach(task -> memberRepository
+                                        .findByTaskAndMember(task, userProvider.getCurrentAppUser())
+                                        .ifPresent(memberRepository::delete));
                         return eventRepository.save(event);
                     } else {
-                        throw new CustomErrorException(
-                                HttpStatus.NOT_FOUND,
-                                ErrorType.MEMBER_NOT_FOUND,
-                                "Member doesn't exist"
-                        );
+                        throw CustomErrorException.memberNotExistError;
                     }
                 })
-                .orElseThrow(() -> new CustomErrorException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorType.EVENT_NOT_FOUND,
-                        "Event doesn't exist"
-                ));
+                .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
 }

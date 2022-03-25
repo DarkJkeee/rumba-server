@@ -25,9 +25,11 @@ public class Member {
     private Long memberId;
 
     @OneToOne
+    @JoinColumn(name = "account_id", referencedColumnName = "account_id")
     private AppUser member;
 
     @OneToOne
+    @JoinColumn(name = "task_id", referencedColumnName = "task_id")
     private Task task;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
