@@ -9,8 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 @AllArgsConstructor
 public class MemberService {
@@ -45,6 +43,9 @@ public class MemberService {
                             .getMembers()
                             .stream()
                             .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
+                    var memberAlreadyAssigned = memberRepository
+                            .findByTaskAndMember(task, userProvider.getCurrentAppUser())
+                            .isPresent();
                     if (eventNotExist) {
                         throw new CustomErrorException(
                                 HttpStatus.BAD_REQUEST,
@@ -52,6 +53,14 @@ public class MemberService {
                                 "The user isn't a member of the event"
                         );
                     }
+                    if (memberAlreadyAssigned) {
+                        throw new CustomErrorException(
+                                HttpStatus.BAD_REQUEST,
+                                ErrorType.MEMBER_ALREADY_ASSIGNED,
+                                "The user has already assigned to the task"
+                        );
+                    }
+
                     member.setTask(task);
                     member.setMember(userProvider.getCurrentAppUser());
                     return memberRepository.save(member);
@@ -65,7 +74,13 @@ public class MemberService {
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
         memberRepository
                 .findByTaskAndMember(task, userProvider.getCurrentAppUser())
-                .ifPresentOrElse(memberRepository::delete, () -> { throw CustomErrorException.memberNotExistError; });
+                .ifPresentOrElse(memberRepository::delete, () -> {
+                    throw new CustomErrorException(
+                            HttpStatus.BAD_REQUEST,
+                            ErrorType.MEMBER_ALREADY_UNASSIGNED,
+                            "The user has already unassigned"
+                    );
+                });
     }
 
     public void deleteMember(Long eventId) {

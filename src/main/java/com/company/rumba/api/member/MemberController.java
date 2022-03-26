@@ -18,16 +18,16 @@ public class MemberController {
         memberService.addMember(eventId);
     }
 
-    @PostMapping("/assign/{id}")
+    @PostMapping("/assign")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void assignMember(@Valid @RequestBody Member member, @PathVariable Long id) {
-        memberService.assignMember(member, id);
+    public void assignMember(@Valid @RequestBody Member member, @RequestParam("task_id") Long taskId) {
+        memberService.assignMember(member, taskId);
     }
 
-    @DeleteMapping("/unassign/{id}")
+    @DeleteMapping("/unassign")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unassignMember(@PathVariable Long id) {
-        memberService.unassignMember(id);
+    public void unassignMember(@RequestParam("task_id") Long taskId) {
+        memberService.unassignMember(taskId);
     }
 
     @DeleteMapping

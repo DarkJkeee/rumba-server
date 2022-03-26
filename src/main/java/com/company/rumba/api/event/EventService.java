@@ -2,12 +2,10 @@ package com.company.rumba.api.event;
 
 import com.company.rumba.api.dto.ListEvent;
 import com.company.rumba.errors.CustomErrorException;
-import com.company.rumba.errors.ErrorType;
 import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

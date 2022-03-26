@@ -4,9 +4,12 @@ import com.company.rumba.auth.token.ConfirmationToken;
 import com.company.rumba.auth.token.ConfirmationTokenService;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
+import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -61,6 +64,11 @@ public class AppUserService implements UserDetailsService {
         appUserRepository.save(appUser);
 
         return generateConfirmationToken(appUser);
+    }
+
+    public AppUser getCurrentUser() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return loadUserByUsername(userDetails.getUsername());
     }
 
     private String generateConfirmationToken(AppUser appUser) {

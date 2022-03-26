@@ -1,6 +1,5 @@
 package com.company.rumba.auth.jwt;
 
-import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
