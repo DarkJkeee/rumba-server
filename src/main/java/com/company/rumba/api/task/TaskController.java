@@ -1,10 +1,12 @@
 package com.company.rumba.api.task;
 
+import com.company.rumba.api.member.Member;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -23,4 +25,9 @@ public class TaskController {
     public void changeTask(@RequestBody Task task, @PathVariable Long id) {
         taskService.changeTask(task, id);
     }
+
+//    @GetMapping("/{id}")
+//    public List<Member> getMembers(@PathVariable Long id) {
+//        taskService.getMembers(id);
+//    }
 }
