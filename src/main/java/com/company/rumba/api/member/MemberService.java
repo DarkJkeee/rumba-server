@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class MemberService {
     private final TaskRepository taskRepository;
-    private final MemberRepository memberRepository;
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
 
@@ -38,15 +37,15 @@ public class MemberService {
         taskRepository
                 .findById(taskId)
                 .map(task -> {
-                    var eventNotExist = eventRepository
+                    var eventMemberNotExist = eventRepository
                             .findEventByTask(task)
                             .getMembers()
                             .stream()
                             .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
-                    var memberAlreadyAssigned = memberRepository
-                            .findByTaskAndMember(task, userProvider.getCurrentAppUser())
-                            .isPresent();
-                    if (eventNotExist) {
+                    var memberAlreadyAssigned = task.getMembers()
+                            .stream()
+                            .anyMatch(mem -> mem.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
+                    if (eventMemberNotExist) {
                         throw new CustomErrorException(
                                 HttpStatus.BAD_REQUEST,
                                 ErrorType.MEMBER_NOT_FOUND,
@@ -61,26 +60,30 @@ public class MemberService {
                         );
                     }
 
-                    member.setTask(task);
                     member.setMember(userProvider.getCurrentAppUser());
-                    return memberRepository.save(member);
+                    task.getMembers().add(member);
+                    return taskRepository.save(task);
                 })
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
     }
 
     public void unassignMember(Long taskId) {
-        var task = taskRepository
+        taskRepository
                 .findById(taskId)
+                .map(task -> {
+                    var userNotMember = task
+                            .getMembers()
+                            .stream()
+                            .noneMatch(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
+                    if (userNotMember) {
+                        throw CustomErrorException.memberNotExistError;
+                    }
+                    task
+                            .getMembers()
+                            .removeIf(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
+                    return taskRepository.save(task);
+                })
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
-        memberRepository
-                .findByTaskAndMember(task, userProvider.getCurrentAppUser())
-                .ifPresentOrElse(memberRepository::delete, () -> {
-                    throw new CustomErrorException(
-                            HttpStatus.BAD_REQUEST,
-                            ErrorType.MEMBER_ALREADY_UNASSIGNED,
-                            "The user has already unassigned"
-                    );
-                });
     }
 
     public void deleteMember(Long eventId) {
@@ -90,9 +93,11 @@ public class MemberService {
                     if (event.getMembers().removeIf(user -> user.getAccountId().equals(userProvider.getCurrentUserID()))) {
                         event
                                 .getTasks()
-                                .forEach(task -> memberRepository
-                                        .findByTaskAndMember(task, userProvider.getCurrentAppUser())
-                                        .ifPresent(memberRepository::delete));
+                                .forEach(task -> task
+                                        .getMembers()
+                                        .removeIf(member -> member
+                                                .getMember()
+                                                .getAccountId().equals(userProvider.getCurrentUserID())));
                         return eventRepository.save(event);
                     } else {
                         throw CustomErrorException.memberNotExistError;

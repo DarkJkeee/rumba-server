@@ -4,7 +4,6 @@ import com.company.rumba.auth.token.ConfirmationToken;
 import com.company.rumba.auth.token.ConfirmationTokenService;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
-import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

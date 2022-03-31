@@ -70,6 +70,10 @@ public class EventService {
     public Event getEvent(Long id) {
         return eventRepository
                 .findById(id)
+                .map(event -> {
+                    //TODO: Divide this call for creator and member.
+                    return event;
+                })
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
 }

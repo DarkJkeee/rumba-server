@@ -45,6 +45,9 @@ public class Event {
     @Column(name = "is_rescheduled")
     private Boolean isRescheduled = false;
 
+    @Column(name = "place_name")
+    private String placeName;
+
     private Float latitude;
     private Float longitude;
 
@@ -57,8 +60,7 @@ public class Event {
     private ZonedDateTime endDate;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @NotNull(message = "Tasks is mandatory")
-    private List<@Valid Task> tasks;
+    private List<@Valid Task> tasks = new ArrayList<>();
 
     @ManyToMany
     private List<AppUser> members = new ArrayList<>();
