@@ -1,7 +1,6 @@
 package com.company.rumba.api.member;
 
 import com.company.rumba.user.AppUser;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;

@@ -35,6 +35,18 @@ public class TaskService {
         taskRepository.save(newTask);
     }
 
+    public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw CustomErrorException.taskNotExistError;
+        }
+
+        var event = eventRepository.findEventByTask(taskRepository.getById(id));
+        event
+                .getTasks()
+                .removeIf(task -> task.getTaskId().equals(id));
+        eventRepository.save(event);
+    }
+
     public List<Task> getMyTasks(Long id) {
         return eventRepository
                 .findById(id)

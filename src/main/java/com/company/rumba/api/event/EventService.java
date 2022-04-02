@@ -43,7 +43,16 @@ public class EventService {
         eventRepository
                 .findById(id)
                 .map(event -> {
+                    if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
+                        throw new CustomErrorException(
+                                HttpStatus.FORBIDDEN,
+                                ErrorType.FORBIDDEN,
+                                "User is not a creator of the event"
+                        );
+                    }
+
                     newEvent.setMembers(event.getMembers());
+                    newEvent.setTasks(event.getTasks());
                     newEvent.setCreator(userProvider.getCurrentAppUser());
                     newEvent.setEventId(id);
                     return eventRepository.save(newEvent);

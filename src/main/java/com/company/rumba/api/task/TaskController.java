@@ -25,6 +25,10 @@ public class TaskController {
         taskService.changeTask(task, id);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTask(@PathVariable Long id) { taskService.deleteTask(id); }
+
     @GetMapping
     public ResponseEntity<?> getMyTasks(@RequestParam("event_id") Long eventId) {
         return ResponseEntity.ok(taskService.getMyTasks(eventId));
