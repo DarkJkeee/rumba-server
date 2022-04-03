@@ -64,7 +64,11 @@ public class EventService {
         return eventRepository
                 .findAllCreatedBy(userProvider.getCurrentUserID())
                 .stream()
-                .map(event -> modelMapper.map(event, ListEvent.class))
+                .map(event -> {
+                    var listEvent = modelMapper.map(event, ListEvent.class);
+                    listEvent.setIsActionsRequired(event.getTasks().isEmpty());
+                    return listEvent;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -72,7 +76,19 @@ public class EventService {
         return eventRepository
                 .findAllParticipatedBy(userProvider.getCurrentAppUser())
                 .stream()
-                .map(event -> modelMapper.map(event, ListEvent.class))
+                .map(event -> {
+                    var listEvent = modelMapper.map(event, ListEvent.class);
+                    listEvent.setIsActionsRequired(event
+                            .getTasks()
+                            .stream()
+                            .noneMatch(task -> task
+                                    .getMembers()
+                                    .stream()
+                                    .anyMatch(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()))
+                            )
+                    );
+                    return listEvent;
+                })
                 .collect(Collectors.toList());
     }
 

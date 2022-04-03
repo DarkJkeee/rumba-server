@@ -12,6 +12,7 @@ public class ListEvent {
     private Boolean isOnline;
     private Boolean isCancelled;
     private Boolean isRescheduled;
+    private Boolean isActionsRequired;
     private Float latitude;
     private Float longitude;
     private ZonedDateTime startDate;
