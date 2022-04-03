@@ -90,6 +90,8 @@ public class MemberService {
         eventRepository
                 .findById(eventId)
                 .map(event -> {
+
+                    // TODO: Check if curr user is creator or member of event.
                     if (event.getMembers().removeIf(user -> user.getAccountId().equals(userProvider.getCurrentUserID()))) {
                         event
                                 .getTasks()

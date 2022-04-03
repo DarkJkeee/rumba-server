@@ -34,4 +34,12 @@ public class CustomErrorException extends RuntimeException {
             ErrorType.MEMBER_NOT_FOUND,
             "Member doesn't exist"
     );
+
+    public static CustomErrorException forbiddenError(String message) {
+        return new CustomErrorException(
+                HttpStatus.FORBIDDEN,
+                ErrorType.FORBIDDEN,
+                message
+        );
+    }
 }

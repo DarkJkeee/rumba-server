@@ -20,6 +20,10 @@ public class TaskService {
         eventRepository
                 .findById(eventId)
                 .map(event -> {
+                    if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
+                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                    }
+
                     event.getTasks().add(task);
                     return eventRepository.save(event);
                 })
@@ -27,24 +31,34 @@ public class TaskService {
     }
 
     public void changeTask(Task newTask, Long id) {
-        if (!taskRepository.existsById(id)) {
-            throw CustomErrorException.taskNotExistError;
-        }
+        taskRepository
+                .findById(id)
+                .map(task -> {
+                    if (!eventRepository.findEventByTask(task).getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
+                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                    }
 
-        newTask.setTaskId(id);
-        taskRepository.save(newTask);
+                    newTask.setTaskId(id);
+                    return taskRepository.save(newTask);
+                })
+                .orElseThrow(() -> CustomErrorException.taskNotExistError);
     }
 
     public void deleteTask(Long id) {
-        if (!taskRepository.existsById(id)) {
-            throw CustomErrorException.taskNotExistError;
-        }
+        taskRepository
+                .findById(id)
+                .map(task -> {
+                    var event = eventRepository.findEventByTask(task);
+                    if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
+                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                    }
 
-        var event = eventRepository.findEventByTask(taskRepository.getById(id));
-        event
-                .getTasks()
-                .removeIf(task -> task.getTaskId().equals(id));
-        eventRepository.save(event);
+                    event
+                            .getTasks()
+                            .removeIf(task1 -> task1.getTaskId().equals(id));
+                    return eventRepository.save(event);
+                })
+                .orElseThrow(() -> CustomErrorException.taskNotExistError);
     }
 
     public List<Task> getMyTasks(Long id) {
