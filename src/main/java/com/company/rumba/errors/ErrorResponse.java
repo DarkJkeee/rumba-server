@@ -24,12 +24,6 @@ public class ErrorResponse {
         this.path = path;
     }
 
-    public ErrorResponse(ErrorType type, String path, String message) {
-        this(type, path);
-        this.message = message;
-        this.messages = null;
-    }
-
     public ErrorResponse(ErrorType type, String path, List<String> messages) {
         this(type, path);
         this.messages = messages;

@@ -1,6 +1,7 @@
 package com.company.rumba.api.event;
 
 import com.company.rumba.api.dto.ListEvent;
+import com.company.rumba.api.task.Task;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
 import com.company.rumba.utils.UserProvider;
@@ -10,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +25,6 @@ public class EventService {
     private final UserProvider userProvider;
 
     public void createEvent(Event event) {
-        if (event.getIsOnline()) {
-            event.setLatitude(null);
-            event.setLongitude(null);
-        }
-
         if (event.getTasks().stream().anyMatch(task -> task.getTaskId() != null)) {
             throw new CustomErrorException(
                     HttpStatus.BAD_REQUEST,
@@ -35,6 +33,19 @@ public class EventService {
             );
         }
 
+        if (event.getStartDate().isAfter(event.getEndDate())) {
+            throw CustomErrorException.invalidStartAndEndDates;
+        }
+
+        event.getTasks().forEach(task -> setUpTask(event, task));
+
+        if (event.getIsOnline()) {
+            event.setLatitude(null);
+            event.setLongitude(null);
+        }
+
+        event.setCreatedAt(ZonedDateTime.now());
+        event.setEditedAt(ZonedDateTime.now());
         event.setCreator(userProvider.getCurrentAppUser());
         eventRepository.save(event);
     }
@@ -47,10 +58,15 @@ public class EventService {
                         throw CustomErrorException.forbiddenError("User is not a creator of the event");
                     }
 
+                    if (event.getStartDate().isAfter(event.getEndDate())) {
+                        throw CustomErrorException.invalidStartAndEndDates;
+                    }
+
                     newEvent.setMembers(event.getMembers());
                     newEvent.setTasks(event.getTasks());
                     newEvent.setCreator(userProvider.getCurrentAppUser());
                     newEvent.setEventId(id);
+                    newEvent.setEditedAt(ZonedDateTime.now());
                     return eventRepository.save(newEvent);
                 })
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
@@ -91,10 +107,19 @@ public class EventService {
     public Event getEvent(Long id) {
         return eventRepository
                 .findById(id)
-                .map(event -> {
-                    //TODO: Divide this call for creator and member.
-                    return event;
-                })
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
+    }
+
+    public void setUpTask(Event event, @Valid Task task) {
+        if (task.getStartDate().isBefore(event.getStartDate()) || task.getEndDate().isAfter(event.getEndDate())) {
+            throw CustomErrorException.invalidDatesOfTask;
+        }
+
+        if (task.getStartDate().isAfter(task.getEndDate())) {
+            throw CustomErrorException.invalidStartAndEndDates;
+        }
+
+        task.setCreatedAt(ZonedDateTime.now());
+        task.setEditedAt(ZonedDateTime.now());
     }
 }

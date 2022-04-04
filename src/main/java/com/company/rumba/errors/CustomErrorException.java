@@ -35,6 +35,18 @@ public class CustomErrorException extends RuntimeException {
             "Member doesn't exist"
     );
 
+    public static CustomErrorException invalidStartAndEndDates = new CustomErrorException(
+            HttpStatus.BAD_REQUEST,
+            ErrorType.INVALID_DATES,
+            "Start date must be less than end date"
+    );
+
+    public static CustomErrorException invalidDatesOfTask = new CustomErrorException(
+            HttpStatus.BAD_REQUEST,
+            ErrorType.INVALID_DATES,
+            "Start and end dates of task must be between start and end dates of event"
+    );
+
     public static CustomErrorException forbiddenError(String message) {
         return new CustomErrorException(
                 HttpStatus.FORBIDDEN,

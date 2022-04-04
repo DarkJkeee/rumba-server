@@ -1,6 +1,5 @@
 package com.company.rumba.errors;
 
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,9 +31,9 @@ public class ErrorController {
                 new ErrorResponse(
                         ErrorType.VALIDATION_ERROR,
                         ServletUriComponentsBuilder.fromCurrentRequest().build().getPath(),
-                        e.getBindingResult().getAllErrors()
+                        e.getBindingResult().getFieldErrors()
                                 .stream()
-                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
                                 .toList()
                 ),
                 HttpStatus.BAD_REQUEST

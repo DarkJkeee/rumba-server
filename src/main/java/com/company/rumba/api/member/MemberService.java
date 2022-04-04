@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+
 @Service
 @AllArgsConstructor
 public class MemberService {
@@ -27,7 +29,9 @@ public class MemberService {
                                 "The user is already a member of the event"
                         );
                     }
+
                     event.getMembers().add(userProvider.getCurrentAppUser());
+                    event.setEditedAt(ZonedDateTime.now());
                     return eventRepository.save(event);
                 })
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
@@ -45,6 +49,7 @@ public class MemberService {
                     var memberAlreadyAssigned = task.getMembers()
                             .stream()
                             .anyMatch(mem -> mem.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
+
                     if (eventMemberNotExist) {
                         throw new CustomErrorException(
                                 HttpStatus.BAD_REQUEST,
@@ -52,6 +57,7 @@ public class MemberService {
                                 "The user isn't a member of the event"
                         );
                     }
+
                     if (memberAlreadyAssigned) {
                         throw new CustomErrorException(
                                 HttpStatus.BAD_REQUEST,
@@ -62,6 +68,7 @@ public class MemberService {
 
                     member.setMember(userProvider.getCurrentAppUser());
                     task.getMembers().add(member);
+                    task.setEditedAt(ZonedDateTime.now());
                     return taskRepository.save(task);
                 })
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
@@ -78,9 +85,11 @@ public class MemberService {
                     if (userNotMember) {
                         throw CustomErrorException.memberNotExistError;
                     }
+
                     task
                             .getMembers()
                             .removeIf(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
+                    task.setEditedAt(ZonedDateTime.now());
                     return taskRepository.save(task);
                 })
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
@@ -100,6 +109,7 @@ public class MemberService {
                                         .removeIf(member -> member
                                                 .getMember()
                                                 .getAccountId().equals(userProvider.getCurrentUserID())));
+                        event.setEditedAt(ZonedDateTime.now());
                         return eventRepository.save(event);
                     } else {
                         throw CustomErrorException.memberNotExistError;

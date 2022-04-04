@@ -1,6 +1,7 @@
 package com.company.rumba.api.task;
 
 import com.company.rumba.api.member.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -49,4 +50,12 @@ public class Task {
     @Column(name = "end_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "End date is mandatory")
     private ZonedDateTime endDate;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @JsonIgnore
+    private ZonedDateTime createdAt;
+
+    @Column(name = "edited_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @JsonIgnore
+    private ZonedDateTime editedAt;
 }

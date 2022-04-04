@@ -2,10 +2,12 @@ package com.company.rumba.api.event;
 
 import com.company.rumba.api.task.Task;
 import com.company.rumba.user.AppUser;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
@@ -53,10 +55,12 @@ public class Event {
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "Start date is mandatory")
+    @Future
     private ZonedDateTime startDate;
 
     @Column(name = "end_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @NotNull(message = "End date is mandatory")
+    @Future
     private ZonedDateTime endDate;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -68,4 +72,12 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private AppUser creator;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @JsonIgnore
+    private ZonedDateTime createdAt;
+
+    @Column(name = "edited_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @JsonIgnore
+    private ZonedDateTime editedAt;
 }

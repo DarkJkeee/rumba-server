@@ -1,11 +1,13 @@
 package com.company.rumba.api.task;
 
 import com.company.rumba.api.event.EventRepository;
+import com.company.rumba.api.event.EventService;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
 
+    private final EventService eventService;
+
     public void addTask(Task task, Long eventId) {
         eventRepository
                 .findById(eventId)
@@ -24,6 +28,7 @@ public class TaskService {
                         throw CustomErrorException.forbiddenError("User is not a creator of the event");
                     }
 
+                    eventService.setUpTask(event, task);
                     event.getTasks().add(task);
                     return eventRepository.save(event);
                 })
@@ -34,10 +39,22 @@ public class TaskService {
         taskRepository
                 .findById(id)
                 .map(task -> {
-                    if (!eventRepository.findEventByTask(task).getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
+                    var event = eventRepository.findEventByTask(task);
+
+                    if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
                         throw CustomErrorException.forbiddenError("User is not a creator of the event");
                     }
 
+                    if (task.getStartDate().isBefore(event.getStartDate())
+                            || task.getEndDate().isAfter(event.getEndDate())) {
+                        throw CustomErrorException.invalidDatesOfTask;
+                    }
+
+                    if (task.getStartDate().isAfter(task.getEndDate())) {
+                        throw CustomErrorException.invalidStartAndEndDates;
+                    }
+
+                    newTask.setEditedAt(ZonedDateTime.now());
                     newTask.setTaskId(id);
                     return taskRepository.save(newTask);
                 })
