@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @AllArgsConstructor
 public class EventService {
+    private final String invalidDatesErrorMsg = "Start date must be less than end date";
+
     private final ModelMapper modelMapper;
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
@@ -34,7 +36,7 @@ public class EventService {
         }
 
         if (event.getStartDate().isAfter(event.getEndDate())) {
-            throw CustomErrorException.invalidStartAndEndDates;
+            throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
         }
 
         event.getTasks().forEach(task -> setUpTask(event, task));
@@ -59,7 +61,7 @@ public class EventService {
                     }
 
                     if (event.getStartDate().isAfter(event.getEndDate())) {
-                        throw CustomErrorException.invalidStartAndEndDates;
+                        throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 
                     newEvent.setMembers(event.getMembers());
@@ -112,11 +114,13 @@ public class EventService {
 
     public void setUpTask(Event event, @Valid Task task) {
         if (task.getStartDate().isBefore(event.getStartDate()) || task.getEndDate().isAfter(event.getEndDate())) {
-            throw CustomErrorException.invalidDatesOfTask;
+            throw CustomErrorException.invalidDatesError(
+                    "Start and end dates of task must be between start and end dates of event"
+            );
         }
 
         if (task.getStartDate().isAfter(task.getEndDate())) {
-            throw CustomErrorException.invalidStartAndEndDates;
+            throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
         }
 
         task.setCreatedAt(ZonedDateTime.now());

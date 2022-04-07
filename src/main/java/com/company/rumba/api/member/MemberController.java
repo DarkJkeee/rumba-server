@@ -2,9 +2,11 @@ package com.company.rumba.api.member;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 
 @RestController
 @AllArgsConstructor
@@ -16,6 +18,11 @@ public class MemberController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addMember(@RequestParam("event_id") Long eventId) {
         memberService.addMember(eventId);
+    }
+
+    @PostMapping("/try/assign")
+    public ResponseEntity<?> tryAssignMember(@RequestParam("task_id") Long taskId, @Valid @RequestBody Member member) {
+        return ResponseEntity.ok().body(memberService.tryAssignMember(member, taskId));
     }
 
     @PostMapping("/assign")

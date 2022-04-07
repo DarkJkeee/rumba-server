@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class TaskService {
+    private final String invalidDatesErrorMsg = "Start date must be less than end date";
+    private final String userIsNotCreatorErrorMsg = "User is not a creator of the event";
+
     private final UserProvider userProvider;
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
@@ -25,7 +28,7 @@ public class TaskService {
                 .findById(eventId)
                 .map(event -> {
                     if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
-                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                        throw CustomErrorException.forbiddenError(userIsNotCreatorErrorMsg);
                     }
 
                     eventService.setUpTask(event, task);
@@ -42,16 +45,18 @@ public class TaskService {
                     var event = eventRepository.findEventByTask(task);
 
                     if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
-                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                        throw CustomErrorException.forbiddenError(userIsNotCreatorErrorMsg);
                     }
 
                     if (task.getStartDate().isBefore(event.getStartDate())
                             || task.getEndDate().isAfter(event.getEndDate())) {
-                        throw CustomErrorException.invalidDatesOfTask;
+                        throw CustomErrorException.invalidDatesError(
+                                "Start and end dates of task must be between start and end dates of event"
+                        );
                     }
 
                     if (task.getStartDate().isAfter(task.getEndDate())) {
-                        throw CustomErrorException.invalidStartAndEndDates;
+                        throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 
                     newTask.setEditedAt(ZonedDateTime.now());
@@ -67,7 +72,7 @@ public class TaskService {
                 .map(task -> {
                     var event = eventRepository.findEventByTask(task);
                     if (!event.getCreator().getAccountId().equals(userProvider.getCurrentUserID())) {
-                        throw CustomErrorException.forbiddenError("User is not a creator of the event");
+                        throw CustomErrorException.forbiddenError(userIsNotCreatorErrorMsg);
                     }
 
                     event

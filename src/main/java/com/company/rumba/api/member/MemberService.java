@@ -1,6 +1,7 @@
 package com.company.rumba.api.member;
 
 import com.company.rumba.api.event.EventRepository;
+import com.company.rumba.api.task.Task;
 import com.company.rumba.api.task.TaskRepository;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
@@ -37,6 +38,13 @@ public class MemberService {
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
 
+    public boolean tryAssignMember(Member member, Long taskId) {
+        return taskRepository
+                .findById(taskId)
+                .map(task -> checkAvailabilityForMember(task, member.getStartDate(), member.getEndDate()))
+                .orElseThrow(() -> CustomErrorException.taskNotExistError);
+    }
+
     public void assignMember(Member member, Long taskId) {
         taskRepository
                 .findById(taskId)
@@ -46,7 +54,8 @@ public class MemberService {
                             .getMembers()
                             .stream()
                             .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
-                    var memberAlreadyAssigned = task.getMembers()
+                    var memberAlreadyAssigned = task
+                            .getMembers()
                             .stream()
                             .anyMatch(mem -> mem.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
 
@@ -63,6 +72,14 @@ public class MemberService {
                                 HttpStatus.BAD_REQUEST,
                                 ErrorType.MEMBER_ALREADY_ASSIGNED,
                                 "The user has already assigned to the task"
+                        );
+                    }
+
+                    if (!checkAvailabilityForMember(task, member.getStartDate(), member.getEndDate())) {
+                        throw new CustomErrorException(
+                                HttpStatus.BAD_REQUEST,
+                                ErrorType.VALIDATION_ERROR,
+                                "There are full of members on this interval"
                         );
                     }
 
@@ -116,5 +133,18 @@ public class MemberService {
                     }
                 })
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
+    }
+
+    private boolean checkAvailabilityForMember(Task task, ZonedDateTime startDate, ZonedDateTime endDate) {
+        var membersOnInterval = task
+                .getMembers()
+                .stream()
+                .filter(mem -> (!endDate.isAfter(mem.getEndDate())
+                                && !endDate.isBefore(mem.getStartDate()))
+                                || (!startDate.isAfter(mem.getEndDate())
+                                && !startDate.isBefore(mem.getStartDate()))
+                )
+                .count();
+        return membersOnInterval < task.getMembersCount();
     }
 }
