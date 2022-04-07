@@ -30,7 +30,7 @@ public class TaskController {
     public void deleteTask(@PathVariable Long id) { taskService.deleteTask(id); }
 
     @GetMapping
-    public ResponseEntity<?> getMyTasks(@RequestParam("event_id") Long eventId) {
-        return ResponseEntity.ok(taskService.getMyTasks(eventId));
+    public ResponseEntity<?> getMyTask(@RequestParam("event_id") Long eventId) {
+        return ResponseEntity.ok(taskService.getMyTask(eventId));
     }
 }

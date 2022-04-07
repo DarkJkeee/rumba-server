@@ -49,8 +49,8 @@ public class MemberService {
         taskRepository
                 .findById(taskId)
                 .map(task -> {
-                    var eventMemberNotExist = eventRepository
-                            .findEventByTask(task)
+                    var event = eventRepository.findEventByTask(task);
+                    var eventMemberNotExist = event
                             .getMembers()
                             .stream()
                             .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
@@ -82,6 +82,16 @@ public class MemberService {
                                 "There are full of members on this interval"
                         );
                     }
+
+                    event
+                            .getTasks()
+                            .forEach(t -> t
+                                    .getMembers()
+                                    .removeIf(m -> m
+                                            .getMember()
+                                            .getAccountId().equals(userProvider.getCurrentUserID())
+                                    )
+                            );
 
                     member.setMember(userProvider.getCurrentAppUser());
                     task.getMembers().add(member);
@@ -125,7 +135,10 @@ public class MemberService {
                                         .getMembers()
                                         .removeIf(member -> member
                                                 .getMember()
-                                                .getAccountId().equals(userProvider.getCurrentUserID())));
+                                                .getAccountId().equals(userProvider.getCurrentUserID())
+                                        )
+                                );
+
                         event.setEditedAt(ZonedDateTime.now());
                         return eventRepository.save(event);
                     } else {

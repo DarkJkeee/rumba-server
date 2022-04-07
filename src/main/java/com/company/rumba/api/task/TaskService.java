@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -83,18 +81,21 @@ public class TaskService {
                 .orElseThrow(() -> CustomErrorException.taskNotExistError);
     }
 
-    public List<Task> getMyTasks(Long id) {
+    public Task getMyTask(Long id) {
         return eventRepository
                 .findById(id)
                 .map(event -> event
                         .getTasks()
                         .stream()
+                        .findAny()
                         .filter(task -> task
                                 .getMembers()
                                 .stream()
                                 .anyMatch(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()))
                         )
-                        .collect(Collectors.toList())
+                        .stream()
+                        .findFirst()
+                        .orElseThrow(() -> CustomErrorException.taskNotExistError)
                 )
                 .orElseThrow(() -> CustomErrorException.eventNotExistError);
     }
