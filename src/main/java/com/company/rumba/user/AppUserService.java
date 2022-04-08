@@ -70,6 +70,12 @@ public class AppUserService implements UserDetailsService {
         return loadUserByUsername(userDetails.getUsername());
     }
 
+    public void changeUser(ChangeUserRequest userRequest) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = loadUserByUsername(userDetails.getUsername());
+
+    }
+
     private String generateConfirmationToken(AppUser appUser) {
         ConfirmationToken token = new ConfirmationToken(
                 UUID.randomUUID().toString(),

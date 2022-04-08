@@ -87,13 +87,11 @@ public class TaskService {
                 .map(event -> event
                         .getTasks()
                         .stream()
-                        .findAny()
                         .filter(task -> task
                                 .getMembers()
                                 .stream()
                                 .anyMatch(member -> member.getMember().getAccountId().equals(userProvider.getCurrentUserID()))
                         )
-                        .stream()
                         .findFirst()
                         .orElseThrow(() -> CustomErrorException.taskNotExistError)
                 )
