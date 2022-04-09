@@ -35,8 +35,12 @@ public class EventService {
             );
         }
 
-        if (event.getStartDate().isAfter(event.getEndDate())) {
+        if (!event.getStartDate().isBefore(event.getEndDate())) {
             throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
+        }
+
+        if (event.getStartDate().isBefore(ZonedDateTime.now())) {
+            throw CustomErrorException.invalidDatesError("Start date and end date must be in the future");
         }
 
         event.getTasks().forEach(task -> setUpTask(event, task));
@@ -113,13 +117,13 @@ public class EventService {
     }
 
     public void setUpTask(Event event, @Valid Task task) {
-        if (task.getStartDate().isBefore(event.getStartDate()) || task.getEndDate().isAfter(event.getEndDate())) {
+        if (!task.getStartDate().isAfter(event.getStartDate()) || !task.getEndDate().isBefore(event.getEndDate())) {
             throw CustomErrorException.invalidDatesError(
                     "Start and end dates of task must be between start and end dates of event"
             );
         }
 
-        if (task.getStartDate().isAfter(task.getEndDate())) {
+        if (!task.getStartDate().isBefore(task.getEndDate())) {
             throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
         }
 

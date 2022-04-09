@@ -1,4 +1,4 @@
-package com.company.rumba.user;
+package com.company.rumba.user.requests;
 
 import lombok.Data;
 

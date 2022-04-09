@@ -48,8 +48,8 @@ public class TaskService {
                         throw CustomErrorException.forbiddenError(userIsNotCreatorErrorMsg);
                     }
 
-                    if (task.getStartDate().isBefore(event.getStartDate())
-                            || task.getEndDate().isAfter(event.getEndDate())) {
+                    if (!task.getStartDate().isAfter(event.getStartDate())
+                            || !task.getEndDate().isBefore(event.getEndDate())) {
                         throw CustomErrorException.invalidDatesError(
                                 invalidTaskDatesErrorMsg
                         );

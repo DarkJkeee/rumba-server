@@ -71,8 +71,8 @@ public class MemberService {
                         throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 
-                    if (member.getStartDate().isBefore(task.getStartDate())
-                            || member.getEndDate().isAfter(task.getEndDate())) {
+                    if (!member.getStartDate().isAfter(task.getStartDate())
+                            || !member.getEndDate().isBefore(task.getEndDate())) {
                         throw CustomErrorException.invalidDatesError(invalidMemberDatesErrorMsg);
                     }
 
@@ -127,8 +127,6 @@ public class MemberService {
         eventRepository
                 .findById(eventId)
                 .map(event -> {
-
-                    // TODO: Check if curr user is creator or member of event.
                     if (event.getMembers().removeIf(user -> user.getAccountId().equals(userProvider.getCurrentUserID()))) {
                         event
                                 .getTasks()
@@ -164,8 +162,8 @@ public class MemberService {
             return false;
         }
 
-        if (startDate.isBefore(task.getStartDate())
-                || endDate.isAfter(task.getEndDate())) {
+        if (!startDate.isAfter(task.getStartDate())
+                || !endDate.isBefore(task.getEndDate())) {
             return false;
         }
         return membersOnInterval < task.getMembersCount();

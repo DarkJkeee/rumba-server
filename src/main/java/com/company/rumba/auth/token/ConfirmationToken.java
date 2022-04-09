@@ -25,6 +25,9 @@ public class ConfirmationToken {
     @Column(nullable = false)
     private String token;
 
+    @Column(nullable = false)
+    private String email;
+
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime createdAt;
 
@@ -44,11 +47,13 @@ public class ConfirmationToken {
             String token,
             ZonedDateTime createdAt,
             ZonedDateTime expiresAt,
+            String email,
             AppUser appUser
     ) {
         this.token = token;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.email = email;
         this.appUser = appUser;
     }
 }
