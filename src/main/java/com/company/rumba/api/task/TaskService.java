@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class TaskService {
     private final String invalidDatesErrorMsg = "Start date must be less than end date";
+    private final String invalidTaskDatesErrorMsg =
+            "Start and end dates of task must be between start and end dates of event";
     private final String userIsNotCreatorErrorMsg = "User is not a creator of the event";
 
     private final UserProvider userProvider;
@@ -49,7 +51,7 @@ public class TaskService {
                     if (task.getStartDate().isBefore(event.getStartDate())
                             || task.getEndDate().isAfter(event.getEndDate())) {
                         throw CustomErrorException.invalidDatesError(
-                                "Start and end dates of task must be between start and end dates of event"
+                                invalidTaskDatesErrorMsg
                         );
                     }
 

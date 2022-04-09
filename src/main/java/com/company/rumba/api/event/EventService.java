@@ -60,7 +60,7 @@ public class EventService {
                         throw CustomErrorException.forbiddenError("User is not a creator of the event");
                     }
 
-                    if (event.getStartDate().isAfter(event.getEndDate())) {
+                    if (newEvent.getStartDate().isAfter(newEvent.getEndDate())) {
                         throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 

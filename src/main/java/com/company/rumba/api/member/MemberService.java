@@ -15,6 +15,10 @@ import java.time.ZonedDateTime;
 @Service
 @AllArgsConstructor
 public class MemberService {
+    private final String invalidDatesErrorMsg = "Start date must be less than end date";
+    private final String invalidMemberDatesErrorMsg =
+            "Start and end dates must be between start and end dates of the task";
+
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
     private final UserProvider userProvider;
@@ -54,10 +58,6 @@ public class MemberService {
                             .getMembers()
                             .stream()
                             .noneMatch(user -> user.getAccountId().equals(userProvider.getCurrentUserID()));
-                    var memberAlreadyAssigned = task
-                            .getMembers()
-                            .stream()
-                            .anyMatch(mem -> mem.getMember().getAccountId().equals(userProvider.getCurrentUserID()));
 
                     if (eventMemberNotExist) {
                         throw new CustomErrorException(
@@ -67,12 +67,13 @@ public class MemberService {
                         );
                     }
 
-                    if (memberAlreadyAssigned) {
-                        throw new CustomErrorException(
-                                HttpStatus.BAD_REQUEST,
-                                ErrorType.MEMBER_ALREADY_ASSIGNED,
-                                "The user has already assigned to the task"
-                        );
+                    if (member.getStartDate().isAfter(member.getEndDate())) {
+                        throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
+                    }
+
+                    if (member.getStartDate().isBefore(task.getStartDate())
+                            || member.getEndDate().isAfter(task.getEndDate())) {
+                        throw CustomErrorException.invalidDatesError(invalidMemberDatesErrorMsg);
                     }
 
                     if (!checkAvailabilityForMember(task, member.getStartDate(), member.getEndDate())) {
@@ -158,6 +159,15 @@ public class MemberService {
                                 && !startDate.isBefore(mem.getStartDate()))
                 )
                 .count();
+
+        if (startDate.isAfter(endDate)) {
+            return false;
+        }
+
+        if (startDate.isBefore(task.getStartDate())
+                || endDate.isAfter(task.getEndDate())) {
+            return false;
+        }
         return membersOnInterval < task.getMembersCount();
     }
 }
