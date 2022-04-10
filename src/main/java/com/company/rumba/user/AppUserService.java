@@ -1,5 +1,7 @@
 package com.company.rumba.user;
 
+import com.company.rumba.auth.blacklist.JwtTokenBlacklist;
+import com.company.rumba.auth.blacklist.JwtTokenBlacklistRepository;
 import com.company.rumba.auth.email.EmailSender;
 import com.company.rumba.auth.token.ConfirmationToken;
 import com.company.rumba.auth.token.ConfirmationTokenService;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Service
@@ -28,6 +31,7 @@ public class AppUserService implements UserDetailsService {
     private final static String USER_NOT_FOUND = "User with email %s not found";
 
     private final AppUserRepository appUserRepository;
+    private final JwtTokenBlacklistRepository jwtTokenBlacklistRepository;
     private final EmailSender emailSender;
     private final ConfirmationTokenService confirmationTokenService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -93,16 +97,22 @@ public class AppUserService implements UserDetailsService {
         appUserRepository.save(user);
     }
 
-    public void changePassword(ChangePasswordRequest passwordRequest) {
+    public void changePassword(ChangePasswordRequest passwordRequest, String headerJwt) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var user = loadUserByUsername(userDetails.getUsername());
-        if (!bCryptPasswordEncoder.matches(passwordRequest.getPassword(), user.getPassword())) {
-            user.setPassword(bCryptPasswordEncoder.encode(passwordRequest.getPassword()));
-            appUserRepository.save(user);
-            return;
+        if (!bCryptPasswordEncoder.matches(passwordRequest.getNewPassword(), user.getPassword())) {
+            if (bCryptPasswordEncoder.matches(passwordRequest.getOldPassword(), user.getPassword())) {
+                user.setPassword(bCryptPasswordEncoder.encode(passwordRequest.getNewPassword()));
+                appUserRepository.save(user);
+                jwtTokenBlacklistRepository.save(
+                        new JwtTokenBlacklist(getTokenFromHeader(headerJwt), ZonedDateTime.now().plusDays(15))
+                );
+            } else {
+                throw new CustomErrorException(HttpStatus.BAD_REQUEST, ErrorType.VALIDATION_ERROR, "Current password is wrong");
+            }
+        } else {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, ErrorType.VALIDATION_ERROR, "New password is the same");
         }
-
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, ErrorType.VALIDATION_ERROR, "Passwords are the same");
     }
 
     private String generateConfirmationToken(AppUser appUser, String email) {
@@ -115,5 +125,9 @@ public class AppUserService implements UserDetailsService {
         );
         confirmationTokenService.saveConfirmationToken(token);
         return token.getToken();
+    }
+
+    private String getTokenFromHeader(String headerJwt) {
+        return headerJwt.substring(7);
     }
 }

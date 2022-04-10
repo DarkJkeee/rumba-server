@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.Map;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/users")
@@ -25,5 +28,10 @@ public class AppUserController {
 
     @PutMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@RequestBody ChangePasswordRequest passwordRequest) { appUserService.changePassword(passwordRequest); }
+    public void changePassword(
+            @RequestBody @Valid ChangePasswordRequest passwordRequest,
+            @RequestHeader Map<String, String> headers
+    ) {
+        appUserService.changePassword(passwordRequest, headers.get("authorization"));
+    }
 }

@@ -68,6 +68,11 @@ public class EventService {
                         throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 
+                    if (!newEvent.getStartDate().equals(event.getStartDate())
+                            || newEvent.getEndDate().equals(event.getEndDate())) {
+                        newEvent.setIsRescheduled(true);
+                    }
+
                     newEvent.setMembers(event.getMembers());
                     newEvent.setTasks(event.getTasks());
                     newEvent.setCreator(userProvider.getCurrentAppUser());

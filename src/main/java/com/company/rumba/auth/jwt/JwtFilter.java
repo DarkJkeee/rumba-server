@@ -1,5 +1,6 @@
 package com.company.rumba.auth.jwt;
 
+import com.company.rumba.auth.blacklist.JwtTokenBlacklistRepository;
 import com.company.rumba.user.AppUser;
 import com.company.rumba.user.AppUserService;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final AppUserService appUserService;
+    private final JwtTokenBlacklistRepository jwtTokenBlacklistRepository;
 
     @Override
     protected void doFilterInternal(
@@ -36,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("jwt filter...");
         try {
             String token = getTokenFromRequest(request);
-            if (token != null && jwtProvider.validateToken(token)) {
+            if (token != null && jwtProvider.validateToken(token) && jwtTokenBlacklistRepository.findByJwt(token).isEmpty()) {
                 String userLogin = jwtProvider.getLoginFromToken(token);
                 AppUser customUserDetails = appUserService.loadUserByUsername(userLogin);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
