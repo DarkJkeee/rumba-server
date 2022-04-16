@@ -7,7 +7,7 @@ import org.javatuples.Pair;
 import java.time.ZonedDateTime;
 
 public interface AuthService {
-    String register(RegistrationRequest request);
+    void register(RegistrationRequest request);
     Pair<String, ZonedDateTime> login(LoginRequest request);
     String confirmToken(String token);
 }

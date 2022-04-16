@@ -71,8 +71,8 @@ public class MemberService {
                         throw CustomErrorException.invalidDatesError(invalidDatesErrorMsg);
                     }
 
-                    if (!member.getStartDate().isAfter(task.getStartDate())
-                            || !member.getEndDate().isBefore(task.getEndDate())) {
+                    if (member.getStartDate().isBefore(task.getStartDate())
+                            || member.getEndDate().isAfter(task.getEndDate())) {
                         throw CustomErrorException.invalidDatesError(invalidMemberDatesErrorMsg);
                     }
 

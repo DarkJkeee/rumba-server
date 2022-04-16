@@ -17,7 +17,7 @@ public class JwtProvider {
     private String jwtSecret;
 
     public Pair<String, ZonedDateTime> generateToken(String login) {
-        ZonedDateTime expiresAt = ZonedDateTime.now().plusDays(15);
+        ZonedDateTime expiresAt = ZonedDateTime.now().plusMinutes(30);
         return new Pair<>(
                 Jwts.builder()
                         .setSubject(login)

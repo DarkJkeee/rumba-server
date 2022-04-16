@@ -1,7 +1,6 @@
 package com.company.rumba.auth.blacklist;
 
 import lombok.Data;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;

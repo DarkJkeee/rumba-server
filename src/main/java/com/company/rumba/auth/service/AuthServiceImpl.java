@@ -30,8 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public String register(RegistrationRequest request) {
-        // TODO: email validation
+    public void register(RegistrationRequest request) {
         String token =  appUserService.signUpUser(
                 new AppUser(
                         request.getFirstName(),
@@ -42,7 +41,6 @@ public class AuthServiceImpl implements AuthService {
         );
         String link = String.format("https://rumba-app.herokuapp.com/auth/confirm?token=%s", token);
         emailSender.send(request.getEmail(), request.getFirstName(), link);
-        return token;
     }
 
     @Override

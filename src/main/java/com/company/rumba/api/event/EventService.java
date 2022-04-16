@@ -4,6 +4,7 @@ import com.company.rumba.api.dto.ListEvent;
 import com.company.rumba.api.task.Task;
 import com.company.rumba.errors.CustomErrorException;
 import com.company.rumba.errors.ErrorType;
+import com.company.rumba.user.AppUser;
 import com.company.rumba.utils.UserProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,7 +124,7 @@ public class EventService {
     }
 
     public void setUpTask(Event event, @Valid Task task) {
-        if (!task.getStartDate().isAfter(event.getStartDate()) || !task.getEndDate().isBefore(event.getEndDate())) {
+        if (task.getStartDate().isBefore(event.getStartDate()) || task.getEndDate().isAfter(event.getEndDate())) {
             throw CustomErrorException.invalidDatesError(
                     "Start and end dates of task must be between start and end dates of event"
             );
@@ -134,5 +136,22 @@ public class EventService {
 
         task.setCreatedAt(ZonedDateTime.now());
         task.setEditedAt(ZonedDateTime.now());
+    }
+
+    public Long countEventsHours(AppUser user) {
+        return eventRepository
+                .findAllParticipatedBy(user)
+                .stream()
+                .mapToLong(event -> event
+                        .getTasks()
+                        .stream()
+                        .mapToLong(task -> task
+                                .getMembers()
+                                .stream()
+                                .filter(member -> member.getMember().getAccountId().equals(user.getAccountId()))
+                                .mapToLong(member -> Duration.between(member.getStartDate(), member.getEndDate()).toHours())
+                                .sum())
+                        .sum())
+                .sum();
     }
 }
